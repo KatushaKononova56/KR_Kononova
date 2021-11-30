@@ -66,8 +66,8 @@ void TIM2_IRQHandler(){
 void TIM2_For_HC_SR04_Horiz_init(){
 	RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
 	TIM2->CR1 |= TIM_CR1_OPM;
-	TIM2->PSC = 17-1;
-	TIM2->ARR = 23200-1;//1 tact - 1 us, макс - 4 с
+	TIM2->PSC = 9-1;
+	TIM2->ARR = 23200-1;//1 tact - 1 us
 
 	TIM2->CCMR1 |= TIM_CCMR1_CC1S_1; /* 2 канал активен*/
 	TIM2->CCER |= TIM_CCER_CC1E; /* разрешение захвата*/
@@ -123,7 +123,7 @@ void TIM3_IRQHandler(){
 void TIM3_For_HC_SR04_Vert_init(){
 	RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;
 	TIM3->CR1 |= TIM_CR1_OPM;
-	TIM3->PSC = 17-1;
+	TIM3->PSC = 9-1;
 	TIM3->ARR = 23200-1;//1 tact - 1 us
 
 	TIM3->CCMR1 |= TIM_CCMR1_CC1S_0; /* 1 канал активен*/
