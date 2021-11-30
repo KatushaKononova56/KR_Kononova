@@ -88,14 +88,14 @@ void TIM2_For_HC_SR04_Horiz_init(){
 void TIM3_IRQHandler(){
 	if ((TIM3->SR & TIM_SR_CC2IF) != 0){ // срабатывания прерывание для горизонтального датчика
 		time_micro_tick = TIM3->CCR2;
-		if(time_micro_tick <Three_cm){
+		if(time_micro_tick <Three_cm){// так как минимальное расстояние 3см, то любое значение меньше это 0
 			modeBuzzer=BuzzerON_PIT; // настраиваем зуммер на сигнал о яме
 			mode_HC_SR04_Vert = HC_SR04_Vert_OFF; //отключаем датчик
 			work=not_work_in_progress;
 			return;
 		}
-		if(time_micro_tick<Three_metr){ // так как минимальное расстояние 3см, то любое значение меньше это 0
-			//но так как максимальное 4 м, то разумнее больше 3х метров не считывать и сразу писать 0.
+		if(time_micro_tick<Three_metr){
+			//но так как максимальное 4 м, то разумнее больше 3х метров не считывать
 			Distance_metr_Vert = Get_Distance(time_micro_tick); // получаем расстояние в метрах
 			Buffer_AddtoEnd(&Buf_Distance_Vert, Distance_metr_Vert);
 		}
