@@ -25,5 +25,7 @@ void TIM3_For_HC_SR04_Vert_init();
 float Get_Distance(uint16_t time);
 uint8_t Pit_YES_or_NO(float data);
 float Get_Distance_without_temp(uint16_t time);
+void TIM2_work_off();
+void TIM3_work_off();
 
 #endif /* TIM_H_ */

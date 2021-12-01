@@ -70,15 +70,19 @@ void HC_SR04_ON(){
 void HC_SR04_Horiz_Work_ON(){
 	work = work_in_progress;
 	//условие на старт - на пине TRIG установить сигнал 1 и держать 10 мкс
-	TIM2_for_Horiz_ON(); //запускаем таймер
 	pinTRIG_Horiz_HIGH();
 	delay(10);
 	pinTRIG_Horiz_LOW();
+	TIM2_CH1_EN(); /* разрешение захвата*/
+	TIM2_CH2_EN(); /* разрешение захвата*/
+	TIM2_for_Horiz_ON(); //запускаем таймер
 }
 
 void HC_SR04_Vert_Work_ON(){
 	work = work_in_progress;
 	// запуск на старт аналогично горизонтальному
+	TIM3_CH1_EN(); /* разрешение захвата*/
+	TIM3_CH2_EN(); /* разрешение захвата*/
 	TIM3_for_Vert_ON(); //запускаем таймер
 	pinTRIG_Vert_HIGH();
 	delay(10);

@@ -26,12 +26,12 @@ extern Buffer Buf_Distance_Vert;
 void TIM2_IRQHandler(){
 	if ((TIM2->SR & TIM_SR_CC2IF) != 0){ // срабатывания прерывание для горизонтального датчика
 		time_micro_tick = TIM2->CCR2;
-		if(time_micro_tick <Three_cm){
+		if(time_micro_tick <Three_cm){ // нужно в случае ошибки (если больше 4х метров или меньше 3см датчик выдаст 0)
 			time_micro_tick=0;
 			TIM2->CNT = 0;
-			TIM2->CR1 &=~TIM_CR1_CEN;
 			work=not_work_in_progress;
 			mode_HC_SR04_Horiz = HC_SR04_Horiz_OFF; // отключаем датчик
+			TIM2_work_off();
 			return;
 		}
 		if(time_micro_tick<Three_metr){
@@ -54,10 +54,10 @@ void TIM2_IRQHandler(){
 		}
 		time_micro_tick=0;
 		TIM2->CNT = 0;
-		TIM2->CR1 &=~TIM_CR1_CEN;
 		work=not_work_in_progress;
 		modeBuzzer=BuzzerON; // инциализируем работу зуммера
 		mode_HC_SR04_Horiz = HC_SR04_Horiz_OFF; // отключаем датчик
+		TIM2_work_off();
 		return;
 	}
 }
@@ -70,11 +70,9 @@ void TIM2_For_HC_SR04_Horiz_init(){
 	TIM2->ARR = 23200-1;//1 tact - 1 us
 
 	TIM2->CCMR1 |= TIM_CCMR1_CC1S_1; /* 2 канал активен*/
-	TIM2->CCER |= TIM_CCER_CC1E; /* разрешение захвата*/
 
 	TIM2->CCMR1 |= TIM_CCMR1_CC2S_0; /* 2 канал активен (на ту же ножку, как и для первого канала)*/
 	TIM2->CCER |= TIM_CCER_CC2P; // срабатывание по заднему фронту импульса
-	TIM2->CCER |= TIM_CCER_CC2E;
 	TIM2->SMCR |= TIM_SMCR_TS_2 | TIM_SMCR_TS_1 //110: Фильтрованный вход таймера 2 (TI2FP2))
 	| TIM_SMCR_SMS_2; //100: Режим сброса - Возрастающий фронт выбранного входа триггера (TRGI) повторно инициализирует счетчик
 						//и генерирует обновление регистров.
@@ -92,6 +90,7 @@ void TIM3_IRQHandler(){
 			modeBuzzer=BuzzerON_PIT; // настраиваем зуммер на сигнал о яме
 			mode_HC_SR04_Vert = HC_SR04_Vert_OFF; //отключаем датчик
 			work=not_work_in_progress;
+			TIM3_work_off();
 			return;
 		}
 		if(time_micro_tick<Three_metr){
@@ -102,19 +101,20 @@ void TIM3_IRQHandler(){
 		else{
 			Distance_metr_Vert = 3;
 		}
-		TIM2->CNT = 0;
-		TIM2->CR1 &=~TIM_CR1_CEN;
+		TIM3->CNT = 0;
 		if(Pit_YES_or_NO(Distance_metr_Vert)){ // если есть яма или ступенка
 			modeBuzzer=BuzzerON_PIT; // настраиваем зуммер на сигнал о яме
 			Buffer_flush(&Buf_Distance_Vert);//очищаем буффер, так как человек может наступить на яму или обогнуть ее, расстояние измениться
 			mode_HC_SR04_Vert = HC_SR04_Vert_OFF; //отключаем датчик
 			work=not_work_in_progress;
+			TIM3_work_off();
 			return;
 		}
 		// если ямы нет, разрешаем работу горизонтального датчика
 		mode_HC_SR04_Vert = HC_SR04_Vert_OFF;
 		mode_HC_SR04_Horiz = HC_SR04_Horiz_ON;
 		work=not_work_in_progress;
+		TIM3_work_off();
 		return;
 	}
 }
@@ -127,11 +127,9 @@ void TIM3_For_HC_SR04_Vert_init(){
 	TIM3->ARR = 23200-1;//1 tact - 1 us
 
 	TIM3->CCMR1 |= TIM_CCMR1_CC1S_0; /* 1 канал активен*/
-	TIM3->CCER |= TIM_CCER_CC1E; /* разрешение захвата*/
 
 	TIM3->CCMR1 |= TIM_CCMR1_CC2S_1; /* 2 канал активен (на ту же ножку, как и для первого канала)*/
 	TIM3->CCER |= TIM_CCER_CC2P; // срабатывание по заднему фронту импульса
-	TIM3->CCER |= TIM_CCER_CC2E;
 	TIM3->DIER |= TIM_DIER_CC2IE;
 	TIM3->SMCR |= TIM_SMCR_TS_2 | TIM_SMCR_TS_0 //101: Фильтрованный вход таймера 1 (TI1FP1)
 	| TIM_SMCR_SMS_2; //100: Режим сброса - Возрастающий фронт выбранного входа триггера (TRGI) повторно инициализирует счетчик
@@ -167,4 +165,16 @@ uint8_t Pit_YES_or_NO(float data){
 		}
 	}
 	return 0;
+}
+
+void TIM2_work_off(){
+	TIM2->CR1 &=~TIM_CR1_CEN;
+	TIM2->CCER &= ~TIM_CCER_CC1E;
+	TIM2->CCER &= ~TIM_CCER_CC2E;
+}
+
+void TIM3_work_off(){
+	TIM3->CR1 &=~TIM_CR1_CEN;
+	TIM3->CCER &= ~TIM_CCER_CC1E;
+	TIM3->CCER &= ~TIM_CCER_CC2E;
 }

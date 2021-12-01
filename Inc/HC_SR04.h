@@ -53,6 +53,12 @@
 #define TIM2_for_Horiz_ON() TIM2->CR1 |= TIM_CR1_CEN
 #define TIM3_for_Vert_ON() TIM3->CR1 |= TIM_CR1_CEN
 
+#define TIM2_CH1_EN() TIM2->CCER |= TIM_CCER_CC1E
+#define TIM2_CH2_EN() TIM2->CCER |= TIM_CCER_CC2E
+
+#define TIM3_CH1_EN() TIM3->CCER |= TIM_CCER_CC1E
+#define TIM3_CH2_EN() TIM3->CCER |= TIM_CCER_CC2E
+
 void HC_SR04_init();
 void HC_SR04_GPIOC_Init();
 void HC_SR04_Horiz_Work_ON();
