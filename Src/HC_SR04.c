@@ -37,6 +37,7 @@ void HC_SR04_init(){
 void HC_SR04_GPIOC_Init(){
 	Perif_HC_SR04_ON_for_trig(); //тактирование
 	Perif_HC_SR04_for_trig->MODER |= Trig_Vertical_Init_Output | Trig_Horizontal_Init_Output; //настройка на выход
+	//GPIOA->PUPDR |= GPIO_PUPDR_PUPDR2_0;
 	pinTRIG_Horiz_LOW(); // низкий сигнал
 	pinTRIG_Vert_LOW();
 
@@ -68,14 +69,14 @@ void HC_SR04_ON(){
 }
 
 void HC_SR04_Horiz_Work_ON(){
-	work = work_in_progress;
 	//условие на старт - на пине TRIG установить сигнал 1 и держать 10 мкс
-	pinTRIG_Horiz_HIGH();
-	delay(10);
-	pinTRIG_Horiz_LOW();
 	TIM2_CH1_EN(); /* разрешение захвата*/
 	TIM2_CH2_EN(); /* разрешение захвата*/
 	TIM2_for_Horiz_ON(); //запускаем таймер
+	pinTRIG_Horiz_HIGH();
+	delay(10);
+	pinTRIG_Horiz_LOW();
+	work = work_in_progress;
 }
 
 void HC_SR04_Vert_Work_ON(){
