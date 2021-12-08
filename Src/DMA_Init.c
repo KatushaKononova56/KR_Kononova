@@ -15,6 +15,7 @@ void DMA1_CH1_IRQHandler(){
 	DMA1->IFCR |= DMA_IFCR_CTCIF1;
 	status_get_data=ready_data;// устанавливаем готовность данных
 	status_convertion = convertion_no; // говорим, что конвертация завершена
+	TIM15->CR1 &= ~TIM_CR1_CEN;
 }
 
 void DMA1_CH2_3_DMA2_CH1_2_IRQHandler(){

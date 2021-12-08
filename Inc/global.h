@@ -26,7 +26,7 @@
  * USART: PA9 - TX, PA10 -RX
  * */
 
-#define CHECK_HC_SR04 //для выбора режима работы CHECK_MCP9700, CHECK_HC_SR04 or WORK
+#define CHECK_MCP9700 //для выбора режима работы CHECK_MCP9700, CHECK_HC_SR04 or WORK
 //#define with_temp // no_temp, with_temp  - для выбора, какие данные отправлять
 
 

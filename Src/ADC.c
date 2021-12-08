@@ -23,10 +23,9 @@ void GPIOC_init_adc(){
 void TIM15_init_TRG0() {
 	RCC->APB2ENR |= RCC_APB2ENR_TIM15EN;
 	TIM15->CR1 |= TIM_CR1_ARPE;
-	TIM15->ARR = 80-1;
-	TIM15->PSC = 10-1;
+	TIM15->PSC = 80-1; //100 us
+	TIM15->ARR = 10-1;
 	TIM15->CR2 |= TIM_CR2_MMS_1;
-	TIM15->CR1 |= TIM_CR1_CEN;
 }
 
 void ADC_init(){
@@ -36,7 +35,7 @@ void ADC_init(){
 	// выбираем тактирование АЦП от генератора на 14 МГц
 	RCC->CR2 |= RCC_CR2_HSI14ON;
 	while ((RCC->CR2 & RCC_CR2_HSI14RDY) != RCC_CR2_HSI14RDY);
-	ADC1->SMPR |= ADC_SMPR_SMP_1 | ADC_SMPR_SMP_2;
+	ADC1->SMPR |= ADC_SMPR_SMP_1 | ADC_SMPR_SMP_2; //84, 6 us
 	// выбор канала
 	ADC1->CHSELR = ADC_CHSELR_CHSEL10;
 	ADC1->CFGR1|=ADC_CFGR1_EXTEN_0; // rising edge
@@ -54,6 +53,7 @@ void start_convert(){
 	DMA1_Channel1->CCR &= ~DMA_CCR_EN;
 	DMA1_Channel1->CMAR = (uint32_t)(data_adc_DMA);
 	DMA1_Channel1->CNDTR = Size_adc;
+	TIM15->CR1 |= TIM_CR1_CEN;
 	DMA1_Channel1->CCR |= DMA_CCR_EN;
 	ADC1->CR |= ADC_CR_ADEN;
 	ADC1->CR |= ADC_CR_ADSTART;
